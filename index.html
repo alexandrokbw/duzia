@@ -59,23 +59,14 @@
 </div>
     <script>
       
-        // Primeiro verifica autenticação
-    if (!localStorage.getItem("authenticated")) {
-        window.location.href = "login.html";
-    }
+   
         // Carrega o header e inicializa os eventos
     fetch('header.html')
         .then(resp => resp.text())
         .then(html => {
             document.getElementById('main-header').innerHTML = html;
             
-            // Inicializa evento de logout
-            document.getElementById('logoutBtn').addEventListener('click', function() {
-                if (confirm('Tem certeza que deseja sair do sistema?')) {
-                    localStorage.removeItem('authenticated');
-                    window.location.href = 'login.html';
-                }
-            });
+           
 
             // Inicializa outros eventos
             document.getElementById("numeroInput").addEventListener("keypress", function (event) {
