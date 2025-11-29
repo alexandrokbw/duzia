@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duzias e colunas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header id="main-header"></header>
+
+ <div class="app-container">
+    <h1>Análise de Duzias e colunas</h1>
+
+    <div class="mode-toggle-container">
+        <div class="mode-toggle">
+            <button id="duziaBtn" class="mode-toggle-btn active" onclick="switchMode('duzia')">Dúzias</button>
+            <button id="colunaBtn" class="mode-toggle-btn" onclick="switchMode('coluna')">Colunas</button>
+        </div>
+    </div>
+
+    <table id="tabelaRoleta">
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th id="tipoAtualHeader">Dúzia Atual</th>
+                <th id="tipoAtrasadaHeader">Dúzia Mais Atrasada</th>
+                <th>Estado</th>
+                <th>Repetição de Estado</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabela"></tbody>
+    </table>
+
+    <div class="input-section">
+            <div class="input-controls">
+                <input id="numeroInput" type="number" min="0" max="36" placeholder="Número (0-36)" />
+                <button class="adicionar" onclick="adicionarNumero()">
+                    <span class="icon plus-icon"></span>
+                    Adicionar
+                </button>
+            </div>
+
+
+        <div class="control-buttons">
+            <button class="delete-last" onclick="apagarUltimaLinha()" id="btnApagarUltima" disabled>
+                Apagar Última
+            </button>
+            <button class="clear-all" onclick="apagarTudo()" id="btnLimparTudo" disabled>
+                Limpar Tudo
+            </button>
+        </div>
+    </div>
+</div>
+    <script>
+      
+        // Primeiro verifica autenticação
+    if (!localStorage.getItem("authenticated")) {
+        window.location.href = "login.html";
+    }
+        // Carrega o header e inicializa os eventos
+    fetch('header.html')
+        .then(resp => resp.text())
+        .then(html => {
+            document.getElementById('main-header').innerHTML = html;
+            
+            // Inicializa evento de logout
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja sair do sistema?')) {
+                    localStorage.removeItem('authenticated');
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // Inicializa outros eventos
+            document.getElementById("numeroInput").addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    adicionarNumero();
+                }
+            });
+            atualizarBotoes();
+        });
+
+        // Current mode for analysis (duzia or coluna)
+        let currentMode = 'duzia';
+
+        // Constants for roulette mapping
+        const duziasRoleta = {
+            0: "Nenhum",
+            1: "Duzia 1", 2: "Duzia 1", 3: "Duzia 1", 4: "Duzia 1", 5: "Duzia 1", 6: "Duzia 1",
+            7: "Duzia 1", 8: "Duzia 1", 9: "Duzia 1", 10: "Duzia 1", 11: "Duzia 1", 12: "Duzia 1",
+            13: "Duzia 2", 14: "Duzia 2", 15: "Duzia 2", 16: "Duzia 2", 17: "Duzia 2", 18: "Duzia 2",
+            19: "Duzia 2", 20: "Duzia 2", 21: "Duzia 2", 22: "Duzia 2", 23: "Duzia 2", 24: "Duzia 2",
+            25: "Duzia 3", 26: "Duzia 3", 27: "Duzia 3", 28: "Duzia 3", 29: "Duzia 3", 30: "Duzia 3",
+            31: "Duzia 3", 32: "Duzia 3", 33: "Duzia 3", 34: "Duzia 3", 35: "Duzia 3", 36: "Duzia 3"
+        };
+
+        const colunasRoleta = {
+            0: "Nenhuma",
+            1: "Coluna 1", 4: "Coluna 1", 7: "Coluna 1", 10: "Coluna 1", 13: "Coluna 1", 16: "Coluna 1",
+            19: "Coluna 1", 22: "Coluna 1", 25: "Coluna 1", 28: "Coluna 1", 31: "Coluna 1", 34: "Coluna 1",
+            2: "Coluna 2", 5: "Coluna 2", 8: "Coluna 2", 11: "Coluna 2", 14: "Coluna 2", 17: "Coluna 2",
+            20: "Coluna 2", 23: "Coluna 2", 26: "Coluna 2", 29: "Coluna 2", 32: "Coluna 2", 35: "Coluna 2",
+            3: "Coluna 3", 6: "Coluna 3", 9: "Coluna 3", 12: "Coluna 3", 15: "Coluna 3", 18: "Coluna 3",
+            21: "Coluna 3", 24: "Coluna 3", 27: "Coluna 3", 30: "Coluna 3", 33: "Coluna 3", 36: "Coluna 3"
+        };
+
+        // Data variables for each mode
+        let duziaData = {
+            numeros: [], 
+            categoriaAtuais: [], 
+            categoriaAtrasadas: [], 
+            estados: [], 
+            repeticoesEstado: [],
+            ultimasCategorias: { "Duzia 1": -1, "Duzia 2": -1, "Duzia 3": -1 },
+            ultimaCategoriaSorteada: "",
+            ultimaCategoriaAtrasada: "",
+            ultimasRepeticoes: { "intermediario": -1, "repeticao": -1, "atrasado": -1 }
+        };
+
+        let colunaData = {
+            numeros: [], 
+            categoriaAtuais: [], 
+            categoriaAtrasadas: [], 
+            estados: [], 
+            repeticoesEstado: [],
+            ultimasCategorias: { "Coluna 1": -1, "Coluna 2": -1, "Coluna 3": -1 },
+            ultimaCategoriaSorteada: "",
+            ultimaCategoriaAtrasada: "",
+            ultimasRepeticoes: { "intermediario": -1, "repeticao": -1, "atrasado": -1 }
+        };
+
+        // Helper functions
+        function getData() {
+            return currentMode === 'duzia' ? duziaData : colunaData;
+        }
+
+        function determinarCategoria(n) {
+            return currentMode === 'duzia' 
+                ? duziasRoleta[n] || "Inválido" 
+                : colunasRoleta[n] || "Inválido";
+        }
+
+        function categoriaMaisAtrasada(indiceAtual) {
+            const data = getData();
+            
+            if (data.categoriaAtuais.length === 0) return "-";
+
+            let distancias = currentMode === 'duzia' 
+                ? { "Duzia 1": Infinity, "Duzia 2": Infinity, "Duzia 3": Infinity }
+                : { "Coluna 1": Infinity, "Coluna 2": Infinity, "Coluna 3": Infinity };
+
+            for (let i = data.categoriaAtuais.length - 1; i >= 0; i--) {
+                let c = data.categoriaAtuais[i];
+                if (distancias[c] === Infinity) {
+                    distancias[c] = data.categoriaAtuais.length - 1 - i;
+                }
+                if (Object.values(distancias).every(v => v !== Infinity)) break;
+            }
+
+            let categoriaAtrasada = Object.entries(distancias).sort((a, b) => b[1] - a[1])[0][0];
+            return categoriaAtrasada;
+        }
+
+        function determinarEstado(categoriaAtual, categoriaAtrasada, ultimaCategoria) {
+            if (categoriaAtual === "-" || categoriaAtual === "Nenhum" || categoriaAtual === "Nenhuma") return "-";
+            if (ultimaCategoria && categoriaAtual === ultimaCategoria) return "repeticao";
+            if (categoriaAtual === getData().ultimaCategoriaAtrasada) return "atrasado";
+            return "intermediario";
+        }
+
+        function verificarRepeticaoEstado(estadoAtual, ultimoEstado) {
+            return estadoAtual === ultimoEstado && estadoAtual !== "-" ? "repeticao" : "-";
+        }
+
+        // Função para atualizar o estado dos botões
+        function atualizarBotoes() {
+            const data = getData();
+            const temDados = data.numeros.length > 0;
+            
+            document.getElementById("btnApagarUltima").disabled = !temDados;
+            document.getElementById("btnLimparTudo").disabled = !temDados;
+        }
+
+        function atualizarTabela() {
+            const data = getData();
+            let tbody = document.getElementById("corpoTabela");
+            tbody.innerHTML = "";
+            
+            for (let i = 0; i < data.numeros.length; i++) {
+                let tr = document.createElement("tr");
+                const categoriaClass = data.categoriaAtuais[i].toLowerCase().replace(" ", "-");
+                const categoriaAtrasadaClass = data.categoriaAtrasadas[i].toLowerCase().replace(" ", "-");
+                
+                tr.innerHTML = `<td><strong>${data.numeros[i]}</strong></td>
+                                <td class="${categoriaClass}">${data.categoriaAtuais[i]}</td>
+                                <td class="${categoriaAtrasadaClass}">${data.categoriaAtrasadas[i]}</td>
+                                <td class="estado-${data.estados[i]}">${data.estados[i]}</td>
+                                <td>${data.repeticoesEstado[i] === "repeticao" ? "repeticao" : " "}</td>`;
+                tbody.appendChild(tr);
+            }
+            
+            // Atualizar botões após mudança na tabela
+            atualizarBotoes();
+        }
+
+        function adicionarNumero() {
+            const input = document.getElementById("numeroInput");
+            let n = parseInt(input.value);
+
+            if (isNaN(n) || n < 0 || n > 36) { 
+                alert("Número inválido! Digite um número entre 0 e 36.");
+               return; 
+            }
+
+            
+            
+            const data = getData();
+            data.numeros.push(n);
+            
+            let categoriaAtual = determinarCategoria(n);
+            data.categoriaAtuais.push(categoriaAtual);
+            
+            let index = data.categoriaAtuais.length - 1;
+            let categoriaAtrasada = categoriaMaisAtrasada(index);
+            data.categoriaAtrasadas.push(categoriaAtrasada);
+            
+            let ultimaCategoria = data.categoriaAtuais.length > 1 ? data.categoriaAtuais[data.categoriaAtuais.length - 2] : null;
+            let estado = determinarEstado(categoriaAtual, categoriaAtrasada, ultimaCategoria);
+            data.estados.push(estado);
+            
+            data.ultimaCategoriaAtrasada = categoriaAtrasada;
+            
+            let ultimoEstado = data.estados.length > 1 ? data.estados[data.estados.length - 2] : null;
+            let repeticao = verificarRepeticaoEstado(estado, ultimoEstado);
+            data.repeticoesEstado.push(repeticao);
+            
+            if (repeticao === "repeticao") data.ultimasRepeticoes[estado] = index;
+            
+            if (categoriaAtual !== "Nenhum" && categoriaAtual !== "Nenhuma") {
+                data.ultimasCategorias[categoriaAtual] = index;
+            }
+            
+            data.ultimaCategoriaSorteada = categoriaAtual;
+            
+            atualizarTabela();
+            input.value = "";
+        }
+
+        function apagarUltimaLinha() {
+            const data = getData();
+            
+            if (data.numeros.length === 0) {
+                alert("Não há dados para apagar!");
+                return;
+            }
+            
+            // Remover o último elemento de todos os arrays
+            data.numeros.pop();
+            data.categoriaAtuais.pop();
+            data.categoriaAtrasadas.pop();
+            data.estados.pop();
+            data.repeticoesEstado.pop();
+
+            // Recalcular dados se ainda houver elementos
+            if (data.numeros.length > 0) {
+                // Recalcular as últimas categorias
+                const todasCategorias = currentMode === 'duzia' 
+                    ? { "Duzia 1": -1, "Duzia 2": -1, "Duzia 3": -1 }
+                    : { "Coluna 1": -1, "Coluna 2": -1, "Coluna 3": -1 };
+                
+                data.ultimasCategorias = { ...todasCategorias };
+                data.ultimasRepeticoes = { "intermediario": -1, "repeticao": -1, "atrasado": -1 };
+
+                // Recalcular índices das últimas categorias e repetições
+                for (let i = 0; i < data.categoriaAtuais.length; i++) {
+                    const categoria = data.categoriaAtuais[i];
+                    if (categoria !== "Nenhum" && categoria !== "Nenhuma" && data.ultimasCategorias[categoria] !== undefined) {
+                        data.ultimasCategorias[categoria] = i;
+                    }
+                    if (data.repeticoesEstado[i] === "repeticao") {
+                        data.ultimasRepeticoes[data.estados[i]] = i;
+                    }
+                }
+
+                data.ultimaCategoriaSorteada = data.categoriaAtuais[data.categoriaAtuais.length - 1];
+                data.ultimaCategoriaAtrasada = data.categoriaAtrasadas[data.categoriaAtrasadas.length - 1];
+            } else {
+                // Resetar tudo se não houver mais números
+                const todasCategorias = currentMode === 'duzia' 
+                    ? { "Duzia 1": -1, "Duzia 2": -1, "Duzia 3": -1 }
+                    : { "Coluna 1": -1, "Coluna 2": -1, "Coluna 3": -1 };
+                
+                data.ultimasCategorias = { ...todasCategorias };
+                data.ultimasRepeticoes = { "intermediario": -1, "repeticao": -1, "atrasado": -1 };
+                data.ultimaCategoriaSorteada = "";
+                data.ultimaCategoriaAtrasada = "";
+            }
+
+            atualizarTabela();
+        }
+
+        function apagarTudo() {
+            const data = getData();
+            
+            if (data.numeros.length === 0) {
+                alert("Não há dados para apagar!");
+                return;
+            }
+            
+            if (confirm("Tem certeza que deseja apagar todos os dados? Esta ação não pode ser desfeita.")) {
+                // Limpar todos os arrays
+                data.numeros = [];
+                data.categoriaAtuais = [];
+                data.categoriaAtrasadas = [];
+                data.estados = [];
+                data.repeticoesEstado = [];
+                
+                // Resetar objetos de controle
+                const todasCategorias = currentMode === 'duzia' 
+                    ? { "Duzia 1": -1, "Duzia 2": -1, "Duzia 3": -1 }
+                    : { "Coluna 1": -1, "Coluna 2": -1, "Coluna 3": -1 };
+                
+                data.ultimasCategorias = { ...todasCategorias };
+                data.ultimasRepeticoes = { "intermediario": -1, "repeticao": -1, "atrasado": -1 };
+                data.ultimaCategoriaSorteada = "";
+                data.ultimaCategoriaAtrasada = "";
+
+                atualizarTabela();
+            }
+        }
+
+        // Mode switching function
+        function switchMode(mode) {
+            if (currentMode === mode) return;
+            
+            // Update UI
+            if (mode === 'duzia') {
+                document.getElementById('duziaBtn').classList.add('active');
+                document.getElementById('colunaBtn').classList.remove('active');
+                document.getElementById('tipoAtualHeader').textContent = 'Dúzia Atual';
+                document.getElementById('tipoAtrasadaHeader').textContent = 'Dúzia Mais Atrasada';
+            } else {
+                document.getElementById('colunaBtn').classList.add('active');
+                document.getElementById('duziaBtn').classList.remove('active');
+                document.getElementById('tipoAtualHeader').textContent = 'Coluna Atual';
+                document.getElementById('tipoAtrasadaHeader').textContent = 'Coluna Mais Atrasada';
+            }
+            
+            currentMode = mode;
+            atualizarTabela();
+        }
+
+       
+    </script>
+</body>
+</html>

@@ -1,0 +1,454 @@
+/* Estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+ /*  padding: 20px; */
+  background: #121212;
+  color: #eee;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 500;
+  padding-top: 15px;
+}
+
+/* Tabela comum */
+#tabelaRoleta {
+  padding: 30px;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background: #111;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 0px solid #333;
+}
+
+#tabelaRoleta td {
+  padding: 8px 12px;
+  text-align: center;
+  border: 1px solid #333;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+#tabelaRoleta th {
+  background-color: #222;
+  font-weight: 500;
+  padding: 10px;
+}
+
+#tabelaRoleta tr:nth-child(odd) {
+  background-color: #1a1a1a;
+}
+
+#tabelaRoleta tr:nth-child(even) {
+  background-color: #222;
+}
+
+#tabelaRoleta tr:hover td {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Classes de cores para grupos */
+.grupo-verde, .duzia-3, .coluna-3 {
+  background: linear-gradient(135deg, rgba(72, 209, 104, 0.9), rgba(40, 167, 69, 0.7));
+  color: white;
+  font-weight: bold;
+}
+
+.grupo-amarelo {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.9), rgba(255, 215, 0, 0.7));
+  color: black;
+  font-weight: bold;
+}
+
+.grupo-vermelho, .duzia-1, .coluna-1 {
+  background: linear-gradient(135deg, rgba(255, 71, 87, 0.9), rgba(220, 53, 69, 0.7));
+  color: white;
+  font-weight: bold;
+}
+
+.duzia-2, .coluna-2 {
+  background: linear-gradient(135deg, rgba(0, 191, 255, 0.9), rgba(0, 123, 255, 0.7));
+  color: white;
+  font-weight: bold;
+}
+
+/* Grupos Cavalo: 147 = vermelho, 258 = azul, 369 = verde */
+.grupo-147, .grupo-123 {
+  background: linear-gradient(135deg, #ff4747, #dc3545);
+  color: #fff;
+  font-weight: bold;
+}
+.grupo-258,.grupo-456 {
+  background: linear-gradient(135deg, #00bfff, #007bff);
+  color: #fff;
+  font-weight: bold;
+}
+.grupo-369,.grupo-789 {
+  background: linear-gradient(135deg, #48d168, #28a745);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Estados */
+.estado-repeticao, .repeticao {
+  background: linear-gradient(135deg, #ffd700, #ffc107);
+  color: black;
+  font-weight: bold;
+}
+
+.estado-atrasado, .atrasada {
+  background: linear-gradient(135deg, #ff4444, #cc0000);
+  color: white;
+  font-weight: bold;
+}
+
+.estado-intermediario, .intermediaria {
+  background: linear-gradient(135deg, #00bcd4, #0097a7);
+  color: white;
+  font-weight: bold;
+}
+
+.sequencia-repeticao {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+  font-weight: bold;
+}
+
+/* Seção de input */
+.input-section {
+  background-color: #111;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px auto; /* centraliza horizontalmente */
+  max-width: 500px;
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centraliza os elementos internos */
+  gap: 15px;
+}
+
+.input-controls {
+  display: flex;
+  gap: 10px;
+  width: 100%; /* ocupa toda largura disponível */
+  justify-content: center; /* centraliza os elementos */
+}
+
+.control-buttons {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center; /* centraliza os botões */
+}
+
+input[type="number"] {
+  padding: 10px;
+  border: 1px solid #444;
+  background-color: #2c2c2c;
+  color: #fff;
+  border-radius: 4px;
+  flex: 1;
+  font-size: 16px;
+}
+
+input[type="number"]:focus {
+  outline: none;
+  border-color: #666;
+}
+
+/* Botões */
+button {
+  padding: 10px 15px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+button:hover {
+  background-color: #444;
+  transform: translateY(-1px);
+}
+
+button.adicionar {
+  background-color: #2e7d32;
+}
+
+button.adicionar:hover {
+  background-color: #388e3c;
+}
+
+button.delete-last, button.apagar-ultimo {
+  background-color: #ff9800;
+  color: white;
+}
+
+button.delete-last:hover, button.apagar-ultimo:hover {
+  background-color: #f57c00;
+}
+
+button.clear-all, button.apagar {
+  background-color: #d32f2f;
+  color: white;
+}
+
+button.clear-all:hover, button.apagar:hover {
+  background-color: #c62828;
+}
+
+
+
+/* Cores padrão - Vermelho, Azul, Verde */
+.segment-1 { 
+  background: linear-gradient(135deg, rgba(255, 71, 87, 0.9), rgba(220, 53, 69, 0.7));
+}
+
+.segment-2 { 
+  background: linear-gradient(135deg, rgba(0, 191, 255, 0.9), rgba(0, 123, 255, 0.7));
+}
+
+.segment-3 { 
+  background: linear-gradient(135deg, rgba(72, 209, 104, 0.9), rgba(40, 167, 69, 0.7));
+}
+
+    /* Container para a imagem fixa */
+    .fixed-image-container {
+      text-align: center;
+      /* Centraliza a imagem horizontalmente */
+      margin: 20px auto;
+      /* Adiciona margem superior/inferior e centraliza o container */
+      max-width: 500px;
+      /* Limita a largura máxima do container */
+    }
+
+    .fixed-image-container img {
+      max-width: 100%;
+      /* Garante que a imagem seja responsiva */
+      height: auto;
+      /* Mantém a proporção da imagem */
+      display: block;
+      /* Remove o espaço extra abaixo da imagem */
+      margin: 0 auto;
+      /* Centraliza a imagem dentro do container */
+      border: 1px solid #333;
+      /* Opcional: Adiciona uma borda similar ao resto do design */
+      border-radius: 8px;
+      /* Opcional: Borda arredondada */
+    }
+
+    /* Mídia query para ajustar em telas menores, se necessário */
+    @media (max-width: 768px) {
+      .fixed-image-container {
+        margin: 10px auto;
+      }
+    }
+
+    * {
+
+      margin: 0;
+
+      padding: 0;
+
+      box-sizing: border-box;
+
+    }
+
+
+
+    body {
+
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      background-color: #0a0a0a;
+
+      color: #fff;
+
+      min-height: 100vh;
+
+     /*  padding: 20px; */
+
+    }
+
+
+
+    .app-container {
+
+      max-width: 1200px;
+
+      margin: 0 auto;
+
+    }
+
+
+
+    h1 {
+
+      color: #fff;
+
+      text-align: center;
+
+      margin-bottom: 30px;
+
+      font-weight: 500;
+
+    }
+
+/* Responsividade */
+@media (max-width: 768px) {
+ 
+  #tabelaRoleta {
+    font-size: 14px;
+  }
+  .control-buttons {
+    flex-direction: column;
+  }
+  h1 {
+    font-size: 1.8em;
+  }
+  .mode-toggle-btn {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+  .input-controls {
+    flex-direction: column;
+  }
+}
+
+/* Efeito de partículas sutis */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(0, 212, 170, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 212, 170, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(0, 212, 170, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Toggle Switch */
+.mode-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.mode-toggle {
+  display: inline-flex;
+  background-color: #1e1e1e;
+  border-radius: 25px;
+  padding: 5px;
+  border: 1px solid #333;
+}
+
+.mode-toggle-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  background-color: transparent;
+  color: #aaa;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.mode-toggle-btn.active {
+  background-color: #333;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Navbar dark minimalista */
+.navbar {
+    width: 100%;
+    background: rgba(18, 18, 18, 0.98);
+    border-bottom: 1px solid #232323;
+    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.10);
+    padding: 0 0 0 0;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar ul {
+    display: flex;
+    gap: 18px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar ul li {
+    display: flex;
+}
+
+.navbar ul li a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 12px 18px;
+    border-radius: 8px;
+    transition: 
+        background 0.18s,
+        color 0.18s,
+        box-shadow 0.18s;
+    letter-spacing: 0.02em;
+    position: relative;
+}
+
+.navbar ul li a:hover,
+.navbar ul li a.active {
+    background: linear-gradient(90deg, #232323 60%, #232323 100%);
+    color: #00d4aa;
+    box-shadow: 0 2px 8px 0 rgba(0,212,170,0.05);
+}
+
+/* Estilo do botão de logout */
+
+/* Responsivo para navbar */
+@media (max-width: 700px) {
+    .navbar ul {
+        gap: 8px;
+    }
+    .navbar ul li a {
+        font-size: 0.98em;
+        padding: 10px 10px;
+    }
+}
