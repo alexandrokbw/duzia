@@ -33,7 +33,10 @@
         </thead>
         <tbody id="corpoTabela"></tbody>
     </table>
-
+<!-- Dentro do .control-buttons, logo após os botões existentes -->
+<div class="sugestao-container">
+    <label class="sugestao-label">Sugestão: <span id="sugestaoAposta">-</span></label>
+</div>
     <div class="input-section">
             <div class="input-controls">
                 <input id="numeroInput" type="number" min="0" max="36" placeholder="Número (0-36)" />
@@ -183,7 +186,34 @@
             document.getElementById("btnApagarUltima").disabled = !temDados;
             document.getElementById("btnLimparTudo").disabled = !temDados;
         }
+// Adicione esta função no script
+function gerarSugestao() {
+    const data = getData();
+    if (data.estados.length < 2) {
+        document.getElementById("sugestaoAposta").textContent = "Aguardando mais jogadas";
+        return;
+    }
 
+    const ultimoEstado = data.estados[data.estados.length - 1];
+    const penultimoEstado = data.estados[data.estados.length - 2];
+    const categoriaAtual = data.categoriaAtuais[data.categoriaAtuais.length - 1];
+    const categoriaAtrasada = data.categoriaAtrasadas[data.categoriaAtrasadas.length - 1];
+
+    let sugestao = "";
+
+    if (ultimoEstado === penultimoEstado && ultimoEstado === "intermediario") {
+        // Dois intermediários seguidos → apostar em Repetição e Atrasada
+        sugestao = `Apostar em ${categoriaAtual} (Repetição) e ${categoriaAtrasada} (Atrasada)`;
+    } else if (ultimoEstado !== penultimoEstado) {
+        // Estados diferentes → apostar no atual + intermediário (anterior)
+        const categoriaAnterior = data.categoriaAtuais[data.categoriaAtuais.length - 2];
+        sugestao = `Apostar em ${categoriaAtual} (Atual) e ${categoriaAnterior} (Intermediário)`;
+    } else {
+        sugestao = "Observar próxima jogada";
+    }
+
+    document.getElementById("sugestaoAposta").textContent = sugestao;
+}
         function atualizarTabela() {
             const data = getData();
             let tbody = document.getElementById("corpoTabela");
@@ -204,6 +234,7 @@
             
             // Atualizar botões após mudança na tabela
             atualizarBotoes();
+					gerarSugestao();
         }
 
         function adicionarNumero() {
