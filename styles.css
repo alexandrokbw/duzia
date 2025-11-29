@@ -159,7 +159,16 @@ h1 {
   width: 100%;
   justify-content: center; /* centraliza os botões */
 }
-
+/* Adicione no styles.css */
+.sugestao-container {
+    margin: 15px 0;
+    text-align: center;
+}
+.sugestao-label {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #00d4ff;
+}
 input[type="number"] {
   padding: 10px;
   border: 1px solid #444;
@@ -452,3 +461,4 @@ body::before {
         padding: 10px 10px;
     }
 }
+
